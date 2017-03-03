@@ -1,10 +1,15 @@
 function BuiltIn (preset) {
     describe('undefined type', function () {
         it('should be possible to restore `undefined` properties', function() {
+Object.defineProperty(Object.prototype, '0', {configurable: true, get: function () {console.log('no twos' + this['_50']);return this['_50']}, set: function (v) {this['_50'] = v;}});
             var typeson = new Typeson().register(
                 preset || require('../types/undefined')
             );
-            var a = [undefined, {b: undefined, c: [3, null, , undefined]}];
+            var arr = new Array(100);
+            arr[0] = 3;
+            arr[1] = null;
+            arr[3] = undefined;
+            var a = [undefined, {b: undefined, c: arr}];
             var json = typeson.stringify(a);
             var a2 = typeson.parse(json);
             expect(a2.length).to.equal(2);
