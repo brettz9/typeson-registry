@@ -11,7 +11,14 @@ Person.prototype.isMarried = false;
 
 function SimulatedNonBuiltIn () {this.aaa = 5;}
 SimulatedNonBuiltIn.prototype.bbb = 8;
-SimulatedNonBuiltIn.prototype[Symbol.toStringTag] = 'SimulatedNonBuiltIn';
+
+if (typeof Symbol !== 'undefined') {
+    SimulatedNonBuiltIn.prototype[Symbol.toStringTag] = 'SimulatedNonBuiltIn';
+} else {
+    SimulatedNonBuiltIn.prototype.toString = function () {
+        return '[object SimulatedNonBuiltIn]';
+    };
+}
 
 function MyCloneable (obj) {
     this.obj = obj;

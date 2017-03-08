@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/dfahlander/typeson-registry#readme",
   "devDependencies": {
+    "array-includes": "3.0.2",
     "babel-plugin-add-module-exports": "^0.1.1",
     "babel-preset-es2015": "^6.3.13",
     "babelify": "^7.3.0",
@@ -41,6 +42,8 @@
     "jsdom": "^9.11.0",
     "mapstraction": "https://github.com/brettz9/mapstraction#relativePaths",
     "mocha": "^3.2.0",
+    "object-assign": "4.1.1",
+    "promise-polyfill": "6.0.2",
     "uglifyify": "^3.0.4",
     "uuid": "3.0.1",
     "watchify": "3.9.0",

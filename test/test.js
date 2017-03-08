@@ -171,52 +171,56 @@ function BuiltIn (preset) {
         });
     });
 
-    describe('Map', function () {
-        it('should get back a real Map instance with the original data and use complex types also in contained items', function () {
-            var typeson = new Typeson().register(preset || require('../types/map'));
-            var map = new Map();
-            var error = new Error("Error here"),
-                date = new Date(10000);
+    if (typeof Map !== 'undefined') {
+        describe('Map', function () {
+            it('should get back a real Map instance with the original data and use complex types also in contained items', function () {
+                var typeson = new Typeson().register(preset || require('../types/map'));
+                var map = new Map();
+                var error = new Error("Error here"),
+                    date = new Date(10000);
 
-            map.set(error, date);
-            var json = typeson.stringify({m: map});
-            var obj = typeson.parse(json);
-            expect(obj.m).to.be.an.instanceOf(Map);
-            if (preset) {
-                expect(Array.from(obj.m.keys())[0]).to.be.an.instanceOf(Error);
-                expect(Array.from(obj.m.values())[0]).to.be.an.instanceOf(Date);
-            }
+                map.set(error, date);
+                var json = typeson.stringify({m: map});
+                var obj = typeson.parse(json);
+                expect(obj.m).to.be.an.instanceOf(Map);
+                if (preset) {
+                    expect(Array.from(obj.m.keys())[0]).to.be.an.instanceOf(Error);
+                    expect(Array.from(obj.m.values())[0]).to.be.an.instanceOf(Date);
+                }
+            });
         });
-    });
+    }
 
-    describe('Set', function () {
-        it('should get back a real Set instance with the original data and use complex types also in contained items', function () {
-            var typeson = new Typeson().register(preset || require('../types/set'));
-            var set = new Set();
-            var error = new Error("Error here"),
-                date = new Date(10000),
-                str = "",
-                o = {
-                    a: error
-                };
+    if (typeof Set !== 'undefined') {
+        describe('Set', function () {
+            it('should get back a real Set instance with the original data and use complex types also in contained items', function () {
+                var typeson = new Typeson().register(preset || require('../types/set'));
+                var set = new Set();
+                var error = new Error("Error here"),
+                    date = new Date(10000),
+                    str = "",
+                    o = {
+                        a: error
+                    };
 
-            set.add(o);
-            set.add(date);
-            set.add(str);
+                set.add(o);
+                set.add(date);
+                set.add(str);
 
-            var json = typeson.stringify({s: set});
-            var obj = typeson.parse(json);
+                var json = typeson.stringify({s: set});
+                var obj = typeson.parse(json);
 
-            expect(obj.s).to.be.an.instanceOf(Set);
+                expect(obj.s).to.be.an.instanceOf(Set);
 
-            var a = Array.from(obj.s.values());
-            if (preset) {
-                expect(a[0].a).to.be.an.instanceOf(Error);
-                expect(a[1]).to.be.an.instanceOf(Date);
-            }
-            expect(a[2]).to.be.a('string');
+                var a = Array.from(obj.s.values());
+                if (preset) {
+                    expect(a[0].a).to.be.an.instanceOf(Error);
+                    expect(a[1]).to.be.an.instanceOf(Date);
+                }
+                expect(a[2]).to.be.a('string');
+            });
         });
-    });
+    }
 
     describe('ArrayBuffer', function () {
         it('should return an ArrayBuffer', function () {
@@ -231,78 +235,78 @@ function BuiltIn (preset) {
         });
     });
 
-    describe('TypedArrays', function(){
-        describe('Float64Array', function() {
-            it('should get back real Float64Array instance with original array content', function () {
-                var typeson = new Typeson().register(preset || [
-                    require('../types/arraybuffer'),
-                    require('../types/typed-arrays')
-                ]);
-                var a = new Float64Array(3);
-                a[0] = 23.8;
-                a[1] = -15;
-                a[2] = 99;
-                var json = typeson.stringify({a: a});
-                var obj = typeson.parse(json);
-                expect(obj.a).to.be.an.instanceOf(Float64Array);
-                expect(obj.a.length).to.equal(3);
-                expect(obj.a[0]).to.equal(23.8);
-                expect(obj.a[1]).to.equal(-15);
-                expect(obj.a[2]).to.equal(99);
+    if (typeof Float64Array !== 'undefined') {
+        describe('TypedArrays', function(){
+            describe('Float64Array', function() {
+                it('should get back real Float64Array instance with original array content', function () {
+                    var typeson = new Typeson().register(preset || [
+                        require('../types/arraybuffer'),
+                        require('../types/typed-arrays')
+                    ]);
+                    var a = new Float64Array(3);
+                    a[0] = 23.8;
+                    a[1] = -15;
+                    a[2] = 99;
+                    var json = typeson.stringify({a: a});
+                    var obj = typeson.parse(json);
+                    expect(obj.a).to.be.an.instanceOf(Float64Array);
+                    expect(obj.a.length).to.equal(3);
+                    expect(obj.a[0]).to.equal(23.8);
+                    expect(obj.a[1]).to.equal(-15);
+                    expect(obj.a[2]).to.equal(99);
+                });
             });
-        });
 
-        describe('Uint16 arrays over invalid unicode range', function() {
-            it('should work to use any 16-bit number no matter whether it is invalid unicode or not', function(){
-                var typeson = new Typeson().register(preset || [
-                    require('../types/arraybuffer'),
-                    require('../types/typed-arrays')
-                ]);
-                var a = new Uint16Array(0x0900),
-                    i = a.length;
-                while (i--) a[i] = i + 0xd780;
-                var json = typeson.stringify({a: a});
-                //console.log(json);
+            describe('Uint16 arrays over invalid unicode range', function() {
+                it('should work to use any 16-bit number no matter whether it is invalid unicode or not', function(){
+                    var typeson = new Typeson().register(preset || [
+                        require('../types/typed-arrays')
+                    ]);
+                    var a = new Uint16Array(0x0900),
+                        i = a.length;
+                    while (i--) a[i] = i + 0xd780;
+                    var json = typeson.stringify({a: a});
+                    //console.log(json);
 
-                // Emulate a textencoder that eliminates invalid UTF chars
-                i = json.length;
-                var copy = new Uint16Array(i);
-                while (i--) {
-                    var ch = json.charCodeAt(i);
-                    copy[i] = ch >= 0xd800 && ch < 0xe000 ? 0xfffd : ch;
-                }
-                json = String.fromCharCode.apply(null, copy);
+                    // Emulate a textencoder that eliminates invalid UTF chars
+                    i = json.length;
+                    var copy = new Uint16Array(i);
+                    while (i--) {
+                        var ch = json.charCodeAt(i);
+                        copy[i] = ch >= 0xd800 && ch < 0xe000 ? 0xfffd : ch;
+                    }
+                    json = String.fromCharCode.apply(null, copy);
 
-                var obj = typeson.parse(json);
-                expect(obj.a).to.be.an.instanceOf(Uint16Array);
-                expect(obj.a.length).to.equal(a.length);
-                obj.a.forEach(function (x, i) {
-                    expect(x).to.equal(i + 0xd780);
+                    var obj = typeson.parse(json);
+                    expect(obj.a).to.be.an.instanceOf(Uint16Array);
+                    expect(obj.a.length).to.equal(a.length);
+                    obj.a.forEach(function (x, i) {
+                        expect(x).to.equal(i + 0xd780);
+                    });
+                });
+            });
+
+            describe('Int8 arrays with odd length', function () {
+                it('should be possible to use an odd length of an Int8Array', function() {
+                    var typeson = new Typeson().register(preset || [
+                        require('../types/arraybuffer'),
+                        require('../types/typed-arrays')
+                    ]);
+                    var a = new Int8Array(3);
+                    a[0] = 0;
+                    a[1] = 1;
+                    a[2] = 2;
+                    var json = typeson.stringify(a);
+                    // console.log(json);
+                    var a2 = typeson.parse(json);
+                    expect(a2.length).to.equal(3);
+                    expect(a2[0]).to.equal(0);
+                    expect(a2[1]).to.equal(1);
+                    expect(a2[2]).to.equal(2);
                 });
             });
         });
-
-        describe('Int8 arrays with odd length', function () {
-            it('should be possible to use an odd length of an Int8Array', function() {
-                var typeson = new Typeson().register(preset || [
-                    require('../types/arraybuffer'),
-                    require('../types/typed-arrays')
-                ]);
-                var a = new Int8Array(3);
-                a[0] = 0;
-                a[1] = 1;
-                a[2] = 2;
-                var json = typeson.stringify(a);
-                // console.log(json);
-                var a2 = typeson.parse(json);
-                expect(a2.length).to.equal(3);
-                expect(a2[0]).to.equal(0);
-                expect(a2[1]).to.equal(1);
-                expect(a2[2]).to.equal(2);
-            });
-        });
-    });
-
+    }
     /*
     // TODO: Add for typed-arrays-socketio
     describe('TypedArrays Socket-IO', function () {
@@ -325,232 +329,209 @@ function BuiltIn (preset) {
         });
     });
 
-    describe('Intl types', function () {
-        it('should return a Intl.Collator', function () {
-            var typeson = new Typeson().register(preset || [
-                require('../types/intl-types')
-            ]);
-            // After `-u-`, the values don't appear to be validated in Node or Chrome
-            var locales = ['en', 'hi', 'de-AT', 'de-DE-u-co-phonebk', 'en-US-u-kn-true', 'en-US-u-kf-upper'];
-            var opts = {
-                localeMatcher: 'lookup',
-                usage: 'search',
-                sensitivity: 'base',
-                ignorePunctuation: true,
-                numeric: true,
-                caseFirst: 'upper'
-            };
-            var optsClone = JSON.parse(JSON.stringify(opts));
+    if (typeof Intl !== 'undefined') {
+        describe('Intl types', function () {
+            it('should return a Intl.Collator', function () {
+                var typeson = new Typeson().register(preset || [
+                    require('../types/intl-types')
+                ]);
+                // After `-u-`, the values don't appear to be validated in Node or Chrome
+                var locales = ['en', 'hi', 'de-AT', 'de-DE-u-co-phonebk', 'en-US-u-kn-true', 'en-US-u-kf-upper'];
+                var opts = {
+                    localeMatcher: 'lookup',
+                    usage: 'search',
+                    sensitivity: 'base',
+                    ignorePunctuation: true,
+                    numeric: true,
+                    caseFirst: 'upper'
+                };
+                var optsClone = JSON.parse(JSON.stringify(opts));
 
-            var collator = new Intl.Collator(locales, opts);
-            var tson = typeson.stringify(collator, null, 2);
-            var back = typeson.parse(tson);
-            expect(back instanceof Intl.Collator);
-            // console.log(Intl.Collator.supportedLocalesOf(Object.keys(optsClone.locales), optsClone.localeMatcher));
+                var collator = new Intl.Collator(locales, opts);
+                var tson = typeson.stringify(collator, null, 2);
+                var back = typeson.parse(tson);
+                expect(back instanceof Intl.Collator);
+                // console.log(Intl.Collator.supportedLocalesOf(Object.keys(optsClone.locales), optsClone.localeMatcher));
 
-            expect(back.resolvedOptions().locale).to.deep.equal('en-u-co-search');
-            Object.keys(optsClone).filter(
-                (k) => ![
-                    // These would ideally be present but are not available for inspection
-                    'localeMatcher', 'locales'
-                ].includes(k)
-            ).forEach((prop) => {
-                expect(back.resolvedOptions()[prop]).to.deep.equal(optsClone[prop]);
+                expect(back.resolvedOptions().locale).to.deep.equal('en-u-co-search');
+                Object.keys(optsClone).filter(
+                    (k) => ![
+                        // These would ideally be present but are not available for inspection
+                        'localeMatcher', 'locales'
+                    ].includes(k)
+                ).forEach((prop) => {
+                    expect(back.resolvedOptions()[prop]).to.deep.equal(optsClone[prop]);
+                });
+            });
+            it('should return a Intl.DateTimeFormat', function () {
+                var typeson = new Typeson().register(preset || [
+                    require('../types/intl-types')
+                ]);
+                var locales = ['hi', 'de-AT', 'de-DE-u-nu-latn', 'en-US-u-ca-persian'];
+                var opts = {
+                    localeMatcher: 'lookup',
+                    timeZone: 'Asia/Shanghai',
+                    hour12: false,
+                    formatMatcher: 'basic'
+                };
+                var optsClone = JSON.parse(JSON.stringify(opts));
+
+                var dtf = new Intl.DateTimeFormat(locales, opts);
+                var tson = typeson.stringify(dtf, null, 2);
+                var back = typeson.parse(tson);
+                expect(back instanceof Intl.DateTimeFormat);
+                Object.keys(optsClone).filter(
+                    (k) => ![
+                        // These would ideally be present but are not available for inspection
+                        'localeMatcher', 'locales', 'formatMatcher',
+                        'hour12' // Not currently working in Node or Chrome
+                    ].includes(k)
+                ).forEach((prop) => {
+                    expect(back.resolvedOptions()[prop]).to.deep.equal(optsClone[prop]);
+                });
+            });
+            it('should return a Intl.NumberFormat', function () {
+                var typeson = new Typeson().register(preset || [
+                    require('../types/intl-types')
+                ]);
+                var locales = ['hi', 'de-AT', 'de-DE-u-nu-bali'];
+                var opts = {
+                    localeMatcher: 'lookup',
+                    style: 'currency',
+                    currency: 'EUR',
+                    currencyDisplay: 'symbol',
+                    useGrouping: false
+                };
+                var optsClone = JSON.parse(JSON.stringify(opts));
+
+                var dtf = new Intl.NumberFormat(locales, opts);
+                var tson = typeson.stringify(dtf, null, 2);
+                var back = typeson.parse(tson);
+                expect(back instanceof Intl.NumberFormat);
+                Object.keys(optsClone).filter(
+                    (k) => ![
+                        // These would ideally be present but are not available for inspection
+                        'localeMatcher', 'locales'
+                    ].includes(k)
+                ).forEach((prop) => {
+                    expect(back.resolvedOptions()[prop]).to.deep.equal(optsClone[prop]);
+                });
             });
         });
-        it('should return a Intl.DateTimeFormat', function () {
-            var typeson = new Typeson().register(preset || [
-                require('../types/intl-types')
-            ]);
-            var locales = ['hi', 'de-AT', 'de-DE-u-nu-latn', 'en-US-u-ca-persian'];
-            var opts = {
-                localeMatcher: 'lookup',
-                timeZone: 'Asia/Shanghai',
-                hour12: false,
-                formatMatcher: 'basic'
-            };
-            var optsClone = JSON.parse(JSON.stringify(opts));
+    }
+}
 
-            var dtf = new Intl.DateTimeFormat(locales, opts);
-            var tson = typeson.stringify(dtf, null, 2);
-            var back = typeson.parse(tson);
-            expect(back instanceof Intl.DateTimeFormat);
-            Object.keys(optsClone).filter(
-                (k) => ![
-                    // These would ideally be present but are not available for inspection
-                    'localeMatcher', 'locales', 'formatMatcher',
-                    'hour12' // Not currently working in Node or Chrome
-                ].includes(k)
-            ).forEach((prop) => {
-                expect(back.resolvedOptions()[prop]).to.deep.equal(optsClone[prop]);
-            });
-        });
-        it('should return a Intl.NumberFormat', function () {
-            var typeson = new Typeson().register(preset || [
-                require('../types/intl-types')
-            ]);
-            var locales = ['hi', 'de-AT', 'de-DE-u-nu-bali'];
-            var opts = {
-                localeMatcher: 'lookup',
-                style: 'currency',
-                currency: 'EUR',
-                currencyDisplay: 'symbol',
-                useGrouping: false
-            };
-            var optsClone = JSON.parse(JSON.stringify(opts));
+describe('Built-in', BuiltIn);
 
-            var dtf = new Intl.NumberFormat(locales, opts);
-            var tson = typeson.stringify(dtf, null, 2);
+if (typeof ImageData !== 'undefined') {
+    describe('ImageData', function () {
+        it('should get back an ImageData instance with the original data', function () {
+            var typeson = new Typeson().register(
+                require('../types/imagedata')
+            );
+            var imageData = new ImageData(1, 3);
+            var tson = typeson.stringify(imageData);
             var back = typeson.parse(tson);
-            expect(back instanceof Intl.NumberFormat);
-            Object.keys(optsClone).filter(
-                (k) => ![
-                    // These would ideally be present but are not available for inspection
-                    'localeMatcher', 'locales'
-                ].includes(k)
-            ).forEach((prop) => {
-                expect(back.resolvedOptions()[prop]).to.deep.equal(optsClone[prop]);
+            expect(back).to.deep.equal({
+                width: 1, height: 3, data: new Uint8ClampedArray(12)
             });
         });
     });
 }
 
-describe('Built-in', BuiltIn);
+if (typeof ImageBitmap !== 'undefined') {
+    describe('ImageBitmap', function () {
+        it('should get back an ImageBitmap instance with the original data', function (done) {
+            var typeson = new Typeson().register(
+                require('../types/imagebitmap')
+            );
 
-describe('ImageData', function () {
-    it('should get back an ImageData instance with the original data', function () {
-        var typeson = new Typeson().register(
-            require('../types/imagedata')
-        );
-        var imageData = new ImageData(1, 3);
-        var tson = typeson.stringify(imageData);
-        var back = typeson.parse(tson);
-        expect(back).to.deep.equal({
-            width: 1, height: 3, data: new Uint8ClampedArray(12)
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var img = document.createElement('img');
+            // The onload is needed by some browsers per http://stackoverflow.com/a/4776378/271577
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0);
+
+                createImageBitmap(canvas).then(function (imageBitmap) {
+                    var tson = typeson.stringify(imageBitmap);
+                    return typeson.parse(tson);
+                }).then(function (back) {
+                    expect(back.width).to.equal(300 /* img.width */);
+                    expect(back.height).to.equal(150 /* img.height */);
+
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(back, 0, 0);
+                    // Not getting a URL that is displaying properly or exactly consistent between Node/browser
+                    try {
+                        expect(canvas.toDataURL()).to.equal('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAABmJLR0QA/wD/AP+gvaeTAAACC0lEQVR4nO3UQQ3AIADAwDF7uMMeYpiF/UiTOwV9dcy1zwMQ8N4OAPjLsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwg4wMLwgPj2swUCwAAAABJRU5ErkJggg=='
+                        );
+                    } catch (err) {
+                        expect(canvas.toDataURL()).to.equal('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAEYklEQVR4Xu3UAQkAAAwCwdm/9HI83BLIOdw5AgQIRAQWySkmAQIEzmB5AgIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlACBB1YxAJfjJb2jAAAAAElFTkSuQmCC');
+                    }
+                    done();
+                });
+            };
+            // Didn't work with a relative path nor with an SVG file in node-canvas
+            img.src = typeof imageTestFileNode !== 'undefined' ? imageTestFileNode : 'test/Flag_of_the_United_Nations.png'; // browserify-test uses testem which assumes cwd() resolution (in `Config.prototype.resolvePath` of `node_modules/testem/lib/config.js`)
+        });
+        it('should get back an ImageBitmap instance with the original data asynchronously', function (done) {
+            var typeson = new Typeson().register(
+                require('../types/imagebitmap')
+            );
+
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var img = document.createElement('img');
+            // The onload is needed by some browsers per http://stackoverflow.com/a/4776378/271577
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0);
+
+                createImageBitmap(canvas).then(function (imageBitmap) {
+                    var tson = typeson.stringify(imageBitmap);
+                    return typeson.parseAsync(tson);
+                }).then(function (back) {
+                    expect(back.width).to.equal(300); // img.width
+                    expect(back.height).to.equal(150); // img.height
+
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(back, 0, 0);
+                    // Not getting a URL that is displaying properly or exactly consistent between Node/browser
+                    try {
+                        expect(canvas.toDataURL()).to.equal('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAABmJLR0QA/wD/AP+gvaeTAAACC0lEQVR4nO3UQQ3AIADAwDF7uMMeYpiF/UiTOwV9dcy1zwMQ8N4OAPjLsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwg4wMLwgPj2swUCwAAAABJRU5ErkJggg=='
+                        );
+                    } catch (err) {
+                        expect(canvas.toDataURL()).to.equal('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAEYklEQVR4Xu3UAQkAAAwCwdm/9HI83BLIOdw5AgQIRAQWySkmAQIEzmB5AgIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlACBB1YxAJfjJb2jAAAAAElFTkSuQmCC');
+                    }
+                    done();
+                });
+            };
+            // Didn't work with a relative path nor with an SVG file in node-canvas
+            img.src = typeof imageTestFileNode !== 'undefined' ? imageTestFileNode : 'test/Flag_of_the_United_Nations.png'; // browserify-test uses testem which assumes cwd() resolution (in `Config.prototype.resolvePath` of `node_modules/testem/lib/config.js`)
         });
     });
-});
+}
 
-describe('ImageBitmap', function () {
-    it('should get back an ImageBitmap instance with the original data', function (done) {
-        var typeson = new Typeson().register(
-            require('../types/imagebitmap')
-        );
+if (typeof Blob !== 'undefined') {
+    describe('Blob', function () {
+        it('should get back a Blob instance with the original data', function (done) {
+            var typeson = new Typeson().register(
+                require('../types/blob')
+            );
+            var currTime = new Date();
+            var contentType = 'application/json';
+            var stringContents = JSON.stringify('abc\u1234');
 
-        var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext('2d');
-        var img = document.createElement('img');
-        // The onload is needed by some browsers per http://stackoverflow.com/a/4776378/271577
-        img.onload = function () {
-            ctx.drawImage(img, 0, 0);
-
-            createImageBitmap(canvas).then(function (imageBitmap) {
-                var tson = typeson.stringify(imageBitmap);
-                return typeson.parse(tson);
-            }).then(function (back) {
-                expect(back.width).to.equal(300 /* img.width */);
-                expect(back.height).to.equal(150 /* img.height */);
-
-                var canvas = document.createElement('canvas');
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(back, 0, 0);
-                // Not getting a URL that is displaying properly or exactly consistent between Node/browser
-                try {
-                    expect(canvas.toDataURL()).to.equal('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAABmJLR0QA/wD/AP+gvaeTAAACC0lEQVR4nO3UQQ3AIADAwDF7uMMeYpiF/UiTOwV9dcy1zwMQ8N4OAPjLsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwg4wMLwgPj2swUCwAAAABJRU5ErkJggg=='
-                    );
-                } catch (err) {
-                    expect(canvas.toDataURL()).to.equal('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAEYklEQVR4Xu3UAQkAAAwCwdm/9HI83BLIOdw5AgQIRAQWySkmAQIEzmB5AgIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlACBB1YxAJfjJb2jAAAAAElFTkSuQmCC');
-                }
-                done();
+            var blob = new Blob([
+                // BufferSource (ArrayBufferView (Int8Array, etc. or DataView) or ArrayBuffer), Blob, or USVString (strings without unpaired surrogates)
+                stringContents
+            ],
+            {
+                type: contentType // DOMString
             });
-        };
-        // Didn't work with a relative path nor with an SVG file in node-canvas
-        img.src = typeof imageTestFileNode !== 'undefined' ? imageTestFileNode : 'test/Flag_of_the_United_Nations.png'; // browserify-test uses testem which assumes cwd() resolution (in `Config.prototype.resolvePath` of `node_modules/testem/lib/config.js`)
-    });
-    it('should get back an ImageBitmap instance with the original data asynchronously', function (done) {
-        var typeson = new Typeson().register(
-            require('../types/imagebitmap')
-        );
-
-        var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext('2d');
-        var img = document.createElement('img');
-        // The onload is needed by some browsers per http://stackoverflow.com/a/4776378/271577
-        img.onload = function () {
-            ctx.drawImage(img, 0, 0);
-
-            createImageBitmap(canvas).then(function (imageBitmap) {
-                var tson = typeson.stringify(imageBitmap);
-                return typeson.parseAsync(tson);
-            }).then(function (back) {
-                expect(back.width).to.equal(300); // img.width
-                expect(back.height).to.equal(150); // img.height
-
-                var canvas = document.createElement('canvas');
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(back, 0, 0);
-                // Not getting a URL that is displaying properly or exactly consistent between Node/browser
-                try {
-                    expect(canvas.toDataURL()).to.equal('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAABmJLR0QA/wD/AP+gvaeTAAACC0lEQVR4nO3UQQ3AIADAwDF7uMMeYpiF/UiTOwV9dcy1zwMQ8N4OAPjLsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwgw7CADMMCMgwLyDAsIMOwgAzDAjIMC8gwLCDDsIAMwwIyDAvIMCwg4wMLwgPj2swUCwAAAABJRU5ErkJggg=='
-                    );
-                } catch (err) {
-                    expect(canvas.toDataURL()).to.equal('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAEYklEQVR4Xu3UAQkAAAwCwdm/9HI83BLIOdw5AgQIRAQWySkmAQIEzmB5AgIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlAABg+UHCBDICBisTFWCEiBgsPwAAQIZAYOVqUpQAgQMlh8gQCAjYLAyVQlKgIDB8gMECGQEDFamKkEJEDBYfoAAgYyAwcpUJSgBAgbLDxAgkBEwWJmqBCVAwGD5AQIEMgIGK1OVoAQIGCw/QIBARsBgZaoSlACBB1YxAJfjJb2jAAAAAElFTkSuQmCC');
-                }
-                done();
-            });
-        };
-        // Didn't work with a relative path nor with an SVG file in node-canvas
-        img.src = typeof imageTestFileNode !== 'undefined' ? imageTestFileNode : 'test/Flag_of_the_United_Nations.png'; // browserify-test uses testem which assumes cwd() resolution (in `Config.prototype.resolvePath` of `node_modules/testem/lib/config.js`)
-    });
-});
-
-describe('Blob', function () {
-    it('should get back a Blob instance with the original data', function (done) {
-        var typeson = new Typeson().register(
-            require('../types/blob')
-        );
-        var currTime = new Date();
-        var contentType = 'application/json';
-        var stringContents = JSON.stringify('abc\u1234');
-
-        var blob = new Blob([
-            // BufferSource (ArrayBufferView (Int8Array, etc. or DataView) or ArrayBuffer), Blob, or USVString (strings without unpaired surrogates)
-            stringContents
-        ],
-        {
-            type: contentType // DOMString
-        });
-        var tson = typeson.stringify(blob);
-        var back = typeson.parse(tson);
-        expect(back.type).to.equal(contentType);
-        expect('name' in back).to.be.false; // No file properties
-        expect('lastModified' in back).to.be.false; // No file properties
-        var reader = new FileReader();
-        reader.addEventListener('load', function () {
-            expect(reader.result).to.equal(stringContents);
-            done();
-        });
-        reader.addEventListener('error', function () {
-            assert(false, "FileReader should not err");
-        });
-        reader.readAsText(back);
-    });
-    it('should get back a Blob instance with the original data asynchronously', function (done) {
-        var typeson = new Typeson().register(
-            require('../types/blob')
-        );
-        var currTime = new Date();
-        var contentType = 'application/json';
-        var stringContents = JSON.stringify('abc\u1234');
-
-        var blob = new Blob([
-            // BufferSource (ArrayBufferView (Int8Array, etc. or DataView) or ArrayBuffer), Blob, or USVString (strings without unpaired surrogates)
-            stringContents
-        ],
-        {
-            type: contentType // DOMString
-        });
-        typeson.stringifyAsync(blob).then(function (tson) {
+            var tson = typeson.stringify(blob);
             var back = typeson.parse(tson);
             expect(back.type).to.equal(contentType);
             expect('name' in back).to.be.false; // No file properties
@@ -565,60 +546,69 @@ describe('Blob', function () {
             });
             reader.readAsText(back);
         });
-    });
-});
+        it('should get back a Blob instance with the original data asynchronously', function (done) {
+            var typeson = new Typeson().register(
+                require('../types/blob')
+            );
+            var currTime = new Date();
+            var contentType = 'application/json';
+            var stringContents = JSON.stringify('abc\u1234');
 
-describe('File', function () {
-    it('should get back a File instance with the original data', function (done) {
-        var typeson = new Typeson().register(
-            require('../types/file')
-        );
-        var currTime = new Date();
-        var contentType = 'application/json';
-        var fileName = 'aName';
-        var stringContents = JSON.stringify('abc\u1234');
-        var file = new File([
-            // BufferSource (ArrayBufferView (Int8Array, etc. or DataView) or ArrayBuffer), Blob, or USVString (strings without unpaired surrogates)
-            stringContents
-        ],
-        fileName, // USVString (strings without unpaired surrogates)
-        {
-            type: contentType, // DOMString
-            lastModified: currTime // Or number
+            var blob = new Blob([
+                // BufferSource (ArrayBufferView (Int8Array, etc. or DataView) or ArrayBuffer), Blob, or USVString (strings without unpaired surrogates)
+                stringContents
+            ],
+            {
+                type: contentType // DOMString
+            });
+            typeson.stringifyAsync(blob).then(function (tson) {
+                var back = typeson.parse(tson);
+                expect(back.type).to.equal(contentType);
+                expect('name' in back).to.be.false; // No file properties
+                expect('lastModified' in back).to.be.false; // No file properties
+                var reader = new FileReader();
+                reader.addEventListener('load', function () {
+                    expect(reader.result).to.equal(stringContents);
+                    done();
+                });
+                reader.addEventListener('error', function () {
+                    assert(false, "FileReader should not err");
+                });
+                reader.readAsText(back);
+            });
         });
-        var tson = typeson.stringify(file);
-        var back = typeson.parse(tson);
-        expect(back.lastModified).to.equal(currTime.getTime());
-        expect(back.type).to.equal(contentType);
-        expect(back.name).to.equal(fileName);
-        var reader = new FileReader();
-        reader.addEventListener('load', function () {
-            expect(reader.result).to.equal(stringContents);
-            done();
-        });
-        reader.addEventListener('error', function () {
-            assert(false, "FileReader should not err");
-        });
-        reader.readAsText(back);
     });
-    it('should get back a File instance with the original data asynchronously', function (done) {
-        var typeson = new Typeson().register(
-            require('../types/file')
-        );
-        var currTime = new Date();
-        var contentType = 'application/json';
-        var fileName = 'aName';
-        var stringContents = JSON.stringify('abc\u1234');
-        var file = new File([
-            // BufferSource (ArrayBufferView (Int8Array, etc. or DataView) or ArrayBuffer), Blob, or USVString (strings without unpaired surrogates)
-            stringContents
-        ],
-        fileName, // USVString (strings without unpaired surrogates)
-        {
-            type: contentType, // DOMString
-            lastModified: currTime // Or number
-        });
-        typeson.stringifyAsync(file).then(function (tson) {
+}
+
+var badFileSupport = false;
+if (typeof File !== 'undefined') {
+    try {
+        new File([''], 'name', {});
+    } catch (err) {
+        badFileSupport = true;
+    }
+}
+
+if (!badFileSupport && typeof File !== 'undefined' && typeof FileList !== 'undefined' && typeof FileReader !== 'undefined') {
+    describe('File', function () {
+        it('should get back a File instance with the original data', function (done) {
+            var typeson = new Typeson().register(
+                require('../types/file')
+            );
+            var currTime = new Date();
+            var contentType = 'application/json';
+            var fileName = 'aName';
+            var stringContents = JSON.stringify('abc\u1234');
+            var file = new File([
+                // BufferSource (ArrayBufferView (Int8Array, etc. or DataView) or ArrayBuffer), Blob, or USVString (strings without unpaired surrogates)
+                stringContents
+            ],
+            fileName, // USVString (strings without unpaired surrogates)
+            {
+                type: contentType, // DOMString
+                lastModified: currTime // Or number
+            });
+            var tson = typeson.stringify(file);
             var back = typeson.parse(tson);
             expect(back.lastModified).to.equal(currTime.getTime());
             expect(back.type).to.equal(contentType);
@@ -633,81 +623,74 @@ describe('File', function () {
             });
             reader.readAsText(back);
         });
-    });
-});
-
-describe('FileList', function () {
-    this.timeout(5000);
-    it('should get back a FileList instance with the original data', function () {
-        var currTime = new Date();
-        var anotherTime = new Date('1985');
-
-        var input = document.createElement('input');
-        input.type = 'file';
-        input.files = [ // See the test-entry for our adapter to make this settable
-            new File([
-                'content1'
+        it('should get back a File instance with the original data asynchronously', function (done) {
+            var typeson = new Typeson().register(
+                require('../types/file')
+            );
+            var currTime = new Date();
+            var contentType = 'application/json';
+            var fileName = 'aName';
+            var stringContents = JSON.stringify('abc\u1234');
+            var file = new File([
+                // BufferSource (ArrayBufferView (Int8Array, etc. or DataView) or ArrayBuffer), Blob, or USVString (strings without unpaired surrogates)
+                stringContents
             ],
-            'abc',
+            fileName, // USVString (strings without unpaired surrogates)
             {
-                type: 'text/plain', // DOMString
+                type: contentType, // DOMString
                 lastModified: currTime // Or number
-            }),
-            new File([
-                'content2'
-            ],
-            'def',
-            {
-                type: 'text/html', // DOMString
-                lastModified: anotherTime // Or number
-            })
-        ];
-
-        expect(input.files).to.be.an.instanceOf(FileList);
-        var typeson = new Typeson().register(
-            require('../types/filelist')
-        );
-        var tson = typeson.stringify(input.files);
-        var back = typeson.parse(tson);
-        expect(back.item(0)).to.be.an.instanceOf(File);
-        expect(back.item(0).lastModified).to.equal(currTime.getTime());
-        expect(back.item(0).type).to.equal('text/plain');
-        expect(back.item(0).name).to.equal('abc');
-        expect(back.item(1)).to.be.an.instanceOf(File);
-        expect(back.item(1).lastModified).to.equal(anotherTime.getTime());
-        expect(back.item(1).type).to.equal('text/html');
-        expect(back.item(1).name).to.equal('def');
+            });
+            typeson.stringifyAsync(file).then(function (tson) {
+                var back = typeson.parse(tson);
+                expect(back.lastModified).to.equal(currTime.getTime());
+                expect(back.type).to.equal(contentType);
+                expect(back.name).to.equal(fileName);
+                var reader = new FileReader();
+                reader.addEventListener('load', function () {
+                    expect(reader.result).to.equal(stringContents);
+                    done();
+                });
+                reader.addEventListener('error', function () {
+                    assert(false, "FileReader should not err");
+                });
+                reader.readAsText(back);
+            });
+        });
     });
-    it('should get back a FileList instance with the original data asynchronously', function () {
-        var currTime = new Date();
-        var anotherTime = new Date('1985');
 
-        var input = document.createElement('input');
-        input.type = 'file';
-        input.files = [ // See the test-entry for our adapter to make this settable
-            new File([
-                'content1'
-            ],
-            'abc',
-            {
-                type: 'text/plain', // DOMString
-                lastModified: currTime // Or number
-            }),
-            new File([
-                'content2'
-            ],
-            'def',
-            {
-                type: 'text/html', // DOMString
-                lastModified: anotherTime // Or number
-            })
-        ];
 
-        expect(input.files).to.be.an.instanceOf(FileList);
-        var typeson = new Typeson().register(
-            require('../types/filelist')
-        );
-        typeson.stringifyAsync(input.files).then(function (tson) {
+    describe('FileList', function () {
+        this.timeout(5000);
+        it('should get back a FileList instance with the original data', function () {
+            var currTime = new Date();
+            var anotherTime = new Date('1985');
+
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.files = [ // See the test-entry for our adapter to make this settable
+                new File([
+                    'content1'
+                ],
+                'abc',
+                {
+                    type: 'text/plain', // DOMString
+                    lastModified: currTime // Or number
+                }),
+                new File([
+                    'content2'
+                ],
+                'def',
+                {
+                    type: 'text/html', // DOMString
+                    lastModified: anotherTime // Or number
+                })
+            ];
+
+            expect(input.files).to.be.an.instanceOf(FileList);
+            var typeson = new Typeson().register(
+                require('../types/filelist')
+            );
+            var tson = typeson.stringify(input.files);
             var back = typeson.parse(tson);
             expect(back.item(0)).to.be.an.instanceOf(File);
             expect(back.item(0).lastModified).to.equal(currTime.getTime());
@@ -718,8 +701,49 @@ describe('FileList', function () {
             expect(back.item(1).type).to.equal('text/html');
             expect(back.item(1).name).to.equal('def');
         });
+        it('should get back a FileList instance with the original data asynchronously', function () {
+            var currTime = new Date();
+            var anotherTime = new Date('1985');
+
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.files = [ // See the test-entry for our adapter to make this settable
+                new File([
+                    'content1'
+                ],
+                'abc',
+                {
+                    type: 'text/plain', // DOMString
+                    lastModified: currTime // Or number
+                }),
+                new File([
+                    'content2'
+                ],
+                'def',
+                {
+                    type: 'text/html', // DOMString
+                    lastModified: anotherTime // Or number
+                })
+            ];
+
+            expect(input.files).to.be.an.instanceOf(FileList);
+            var typeson = new Typeson().register(
+                require('../types/filelist')
+            );
+            typeson.stringifyAsync(input.files).then(function (tson) {
+                var back = typeson.parse(tson);
+                expect(back.item(0)).to.be.an.instanceOf(File);
+                expect(back.item(0).lastModified).to.equal(currTime.getTime());
+                expect(back.item(0).type).to.equal('text/plain');
+                expect(back.item(0).name).to.equal('abc');
+                expect(back.item(1)).to.be.an.instanceOf(File);
+                expect(back.item(1).lastModified).to.equal(anotherTime.getTime());
+                expect(back.item(1).type).to.equal('text/html');
+                expect(back.item(1).name).to.equal('def');
+            });
+        });
     });
-});
+}
 
 describe('Non-built-in object ignoring', function () {
     it('should ignore non-built-in objects (simulated)', function () {
@@ -808,7 +832,7 @@ describe('Resurrectables', function () {
         );
         var mr = new util.MyResurrectable();
         var mr2 = function resurrectableFunction () {};
-        var mr3 = Symbol('resurrectable');
+        var mr3 = typeof Symbol !== 'undefined' ? Symbol('resurrectable') : 'resurrectable';
         var mr4 = {};
         var mr5 = [3, 4, 5];
 

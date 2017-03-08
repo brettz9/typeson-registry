@@ -6,6 +6,16 @@ global.chai = window.chai = require('chai');
 global.Typeson = window.Typeson = require('typeson');
 // var Typeson = require('../dist/all.js');
 
+if (!Object.assign) {
+    global.Object.assign = require('object-assign');
+}
+if (!Array.prototype.includes) {
+    Array.prototype.includes = require('array-includes');
+}
+if (typeof Promise === 'undefined') {
+    global.Promise = require('promise-polyfill');
+}
+
 global.Array.from = require('../utils/array-from-iterator');
 
 // No means to set a `FileList` currently in jsdom so we
@@ -18,7 +28,13 @@ function FileList () {
 FileList.prototype.item = function (index) {
     return this._files[index];
 };
-FileList.prototype[Symbol.toStringTag] = 'FileList';
+if (typeof Symbol !== 'undefined') {
+    FileList.prototype[Symbol.toStringTag] = 'FileList';
+} else {
+    FileList.prototype.toString = function () {
+        return '[object FileList]';
+    };
+}
 Object.defineProperty(global.HTMLInputElement.prototype, 'files', {
     get: function () {
         return new FileList(this._files);

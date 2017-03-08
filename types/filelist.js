@@ -17,7 +17,13 @@ exports.FileList = {
         FileList.prototype.item = function (index) {
             return this._files[index];
         };
-        FileList.prototype[Symbol.toStringTag] = 'FileList';
+        if (typeof Symbol !== 'undefined') {
+            FileList.prototype[Symbol.toStringTag] = 'FileList';
+        } else {
+            FileList.prototype.toString = function () {
+                return '[object FileList]';
+            };
+        }
         return new FileList(o);
     }
 };
