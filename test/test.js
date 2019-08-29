@@ -951,6 +951,16 @@ describe('Blob', function () {
         };
         reader.readAsArrayBuffer(tback);
     });
+    it('should stringify a Blob with Uint8Array within an object', () => {
+        const typeson = new Typeson().register([blob]);
+        const obj = {name: 'file.bin', data: new Blob([
+            new Uint8Array([1, 2, 3])
+        ])};
+        const tson = typeson.stringify(obj);
+        console.log('tson', tson);
+        const tback = typeson.parse(tson);
+        console.log('tback', tback.data);
+    });
 });
 
 describe('File', function () {
