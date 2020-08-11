@@ -8,6 +8,12 @@ const imagedata = {
     imagedata: {
         test (x) { return Typeson.toStringTag(x) === 'ImageData'; },
         replace (d) {
+            console.log('replacing...', {
+                // Ensure `length` gets preserved for revival
+                array: [...d.data],
+                width: d.width,
+                height: d.height
+            });
             return {
                 // Ensure `length` gets preserved for revival
                 array: [...d.data],
@@ -16,6 +22,7 @@ const imagedata = {
             };
         },
         revive (o) {
+            console.log('w,h', o.width, o.height);
             return new ImageData(
                 new Uint8ClampedArray(o.array), o.width, o.height
             );

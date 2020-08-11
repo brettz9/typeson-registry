@@ -940,6 +940,7 @@ describe('ImageData', () => {
         const imageData = new ImageData(1, 3);
         const tson = typeson.stringify(imageData);
         const back = typeson.parse(tson);
+        console.log('back', back);
         expect(back.width).to.equal(1);
         expect(back.height).to.equal(3);
         expect(back.data).to.deep.equal(new Uint8ClampedArray(12));
