@@ -934,10 +934,12 @@ if (typeof io !== 'undefined') {
     );
 }
 
-describe('ImageData', () => {
+describe.only('ImageData', () => {
     it('should get back an ImageData instance with the original data', () => {
         const typeson = new Typeson().register(imagedata);
         const imageData = new ImageData(1, 3);
+        console.log(Object.prototype.toString.call(imageData));
+
         const tson = typeson.stringify(imageData);
         const back = typeson.parse(tson);
         console.log('back', back);
