@@ -6,7 +6,11 @@ import Typeson from 'typeson';
 
 const imagedata = {
     imagedata: {
-        test (x) { return Typeson.toStringTag(x) === 'ImageData'; },
+        test (x) {
+            console.log('xxxx', x);
+            console.log('tst', Typeson.toStringTag(x));
+            return Typeson.toStringTag(x) === 'ImageData';
+        },
         replace (d) {
             console.log('replacing...', {
                 // Ensure `length` gets preserved for revival
