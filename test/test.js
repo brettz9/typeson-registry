@@ -388,6 +388,16 @@ function BuiltIn (preset) {
                 expect(obj.m.values().next().value).to.be.an.instanceOf(Date);
             }
         });
+
+        it.only('should get back a real Map instance with the original data ' +
+            'with empty string key', () => {
+            const typeson = new Typeson().register(preset || map);
+            const map1 = new Map();
+
+            const json = typeson.stringify({'': map1});
+            const obj = typeson.parse(json);
+            expect(obj['']).to.be.an.instanceOf(Map);
+        });
     });
 
     describe('Set', () => {

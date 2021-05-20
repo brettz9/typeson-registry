@@ -4,7 +4,10 @@ const map = {
     map: {
         test (x) { return Typeson.toStringTag(x) === 'Map'; },
         replace (mp) { return [...mp.entries()]; },
-        revive (entries) { return new Map(entries); }
+        revive (entries) {
+            console.log('entries', entries);
+            return new Map(entries);
+        }
     }
 };
 
