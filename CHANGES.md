@@ -3,6 +3,7 @@
 ## ?
 
 - feat: Add `DOMQuad` type
+- feat: Add `FileSystemDirectoryHandle` type
 
 ## Version 9.1.1
 

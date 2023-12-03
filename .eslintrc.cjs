@@ -42,6 +42,8 @@ module.exports = {
             'JSON',
             'location.href',
             'Map',
+            'navigator',
+            'navigator.storage',
             'Number.isNaN',
             'Number.NaN',
             'Number.parseInt',
