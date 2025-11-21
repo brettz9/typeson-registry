@@ -1,4 +1,3 @@
-/* globals process, Buffer -- Needed for check */
 /* globals InternalError -- If available */
 /* globals document, ImageData, createImageBitmap, FileReader,
     DOMRect, DOMPoint, DOMMatrix,
@@ -9,6 +8,7 @@
     convenient for checking here */
 /* eslint-disable new-cap -- For clarity */
 /* eslint-disable unicorn/prefer-blob-reading-methods -- https://github.com/jsdom/jsdom/issues/2555 */
+/* eslint-disable n/no-unsupported-features/node-builtins -- Testing */
 
 /* eslint-disable no-shadow -- Needed */
 import {it, describe} from 'mocha';
@@ -767,6 +767,8 @@ function BuiltIn (preset) {
                     const ch = json.charCodeAt(i);
                     copy[i] = ch >= 0xD800 && ch < 0xE000 ? 0xFFFD : ch;
                 }
+                // eslint-disable-next-line @stylistic/max-len -- Long
+                // eslint-disable-next-line unicorn/prefer-code-point -- Want char code
                 json = String.fromCharCode.apply(null, Array.from(copy));
 
                 const obj = typeson.parse(/** @type {string} */ (json));
@@ -1018,6 +1020,7 @@ function BuiltIn (preset) {
 
     if (typeof BigInt !== 'undefined') {
         describe('BigInt', () => {
+            /* eslint-disable unicorn/prefer-bigint-literals -- Testing */
             it('bigint', () => {
                 const typeson = new Typeson().register(preset || bigint);
                 const tson = typeson.stringify(
@@ -1038,6 +1041,7 @@ function BuiltIn (preset) {
                     new Object(BigInt('9007199254740993'))
                 );
             });
+            /* eslint-enable unicorn/prefer-bigint-literals -- Testing */
         });
     }
 }

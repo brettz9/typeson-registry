@@ -1,5 +1,6 @@
 /* globals window -- Polyfills */
-/* eslint-disable unicorn/prefer-global-this -- Polyfill */
+/* eslint-disable unicorn/prefer-global-this,
+  n/no-unsupported-features/node-builtins -- Polyfill */
 
 import path from 'node:path';
 import {webcrypto} from 'node:crypto';

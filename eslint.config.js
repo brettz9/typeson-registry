@@ -1,5 +1,7 @@
 import ashNazg from 'eslint-config-ash-nazg';
 import nodePlugin from 'eslint-plugin-n';
+import stylistic from '@stylistic/eslint-plugin';
+import markdown from '@eslint/markdown';
 
 export default [
     {
@@ -62,14 +64,6 @@ export default [
         }
     },
     ...ashNazg(['sauron']),
-    {
-        files: ['test/*.js'],
-        rules: {
-            'n/no-unsupported-features/es-syntax': ['error', {
-                ignores: ['modules', 'dynamicImport']
-            }]
-        }
-    },
     ...ashNazg(['sauron', 'browser']).map((cfg) => {
         return {
             ...cfg,
@@ -90,10 +84,25 @@ export default [
             ...cfg
         };
     }),
+    ...ashNazg(['sauron', 'node', 'mocha']).map((cfg) => {
+        return {
+            files: [
+                'test/**/*.js'
+            ],
+            ...cfg,
+            rules: {
+                ...cfg.rules,
+                'no-console': 'off',
+                'n/no-unsupported-features/es-syntax': ['error', {
+                    ignores: ['modules', 'dynamicImport']
+                }]
+            }
+        };
+    }),
     ...ashNazg(['sauron', 'mocha']).map((cfg) => {
         return {
             files: [
-                'test/**.js', 'browser-test/**.js'
+                'browser-test/**.js'
             ],
             ...cfg,
             rules: {
@@ -152,17 +161,23 @@ export default [
     },
     {
         plugins: {
-            n: nodePlugin
+            n: nodePlugin,
+            '@stylistic': stylistic,
+            markdown
         },
         rules: {
             // Disable for now
+            'jsdoc/reject-any-type': 0,
             '@brettz9/no-use-ignored-vars': 0,
             '@stylistic/brace-style': 0,
+            'unicorn/prefer-spread': 0,
+            // v flag not supported in older browsers
+            'require-unicode-regexp': 0,
+
             '@stylistic/indent': ['error', 4, {outerIIFEBody: 0}],
             'n/no-unsupported-features/es-builtins': ['error', {
                 ignores: ['BigInt']
-            }],
-            'unicorn/prefer-spread': 0
+            }]
         }
     }
 ];

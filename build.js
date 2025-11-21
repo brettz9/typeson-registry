@@ -21,7 +21,7 @@ const prologue =
 //   try to read)
 //                       =path/to/source.map
 // require("source-map-support").install();
-`// This file is auto-generated from \`build.js\`
+    `// This file is auto-generated from \`build.js\`
 `;
 const epilogue = "export * from 'typeson';\n";
 

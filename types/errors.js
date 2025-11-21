@@ -24,7 +24,6 @@ if (typeof InternalError === 'function') {
     create(InternalError);
 }
 
-/* eslint-disable jsdoc/valid-types -- https://github.com/jsdoc-type-pratt-parser/jsdoc-type-pratt-parser/issues/131 */
 /**
  * Non-standard.
  * @typedef {{
@@ -32,7 +31,6 @@ if (typeof InternalError === 'function') {
  * (message?: string, options?: ErrorOptions): EvalError;
  * }} InternalErrorConstructor
  */
-/* eslint-enable jsdoc/valid-types -- https://github.com/jsdoc-type-pratt-parser/jsdoc-type-pratt-parser/issues/131 */
 
 /**
  * Comprises all built-in errors.

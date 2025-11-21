@@ -1,5 +1,12 @@
 # typeson-registry
 
+## 13.0.0 (unreleased)
+
+BREAKING CHANGES:
+- Bump minimum Node 22 to 22.16.0
+
+- chore: update whatwg-url, devDeps.
+
 ## 12.0.0
 
 BREAKING CHANGES:
