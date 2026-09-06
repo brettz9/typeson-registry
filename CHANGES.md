@@ -1,5 +1,9 @@
 # typeson-registry
 
+## 14.6.1
+
+- fix: ensure instance properties of base Error class are preserved with webtransporterror and quotaexceedederror
+
 ## 14.6.0
 
 - feat: `IDBKeyRange` type
